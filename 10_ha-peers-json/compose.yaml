@@ -1,0 +1,17 @@
+services:
+  vault:
+    image: ${VAULT_IMAGE:-hashicorp/vault:latest}
+    container_name: vault
+    restart: unless-stopped
+    ports:
+      - "8200:8200"
+      - "8201:8201"
+    cap_add:
+      - IPC_LOCK
+    environment:
+      VAULT_ADDR: "http://127.0.0.1:8200"
+    volumes:
+      - ./config:/vault/config:ro
+      - ./data:/vault/data
+    # VAULT_CONFIG comes from .env on each VM (vault1.hcl / vault2.hcl / vault3.hcl)
+    command: vault server -config=/vault/config/${VAULT_CONFIG:-vault.hcl}
